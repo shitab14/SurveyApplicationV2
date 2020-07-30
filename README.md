@@ -7,3 +7,4 @@
 ![](app/screenshots/4.png)
 ![](app/screenshots/5.png)
 ![](app/screenshots/6.png)
+![](app/screenshots/7.png)
