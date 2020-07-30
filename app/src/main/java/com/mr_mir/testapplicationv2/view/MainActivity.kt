@@ -7,10 +7,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.LinearLayout
-import android.widget.RadioButton
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -22,11 +19,13 @@ import com.mr_mir.testapplicationv2.model.SurveyBody
 import com.mr_mir.testapplicationv2.mvvmfiles.Resource
 import com.mr_mir.testapplicationv2.mvvmfiles.SurveyViewModel
 import com.mr_mir.testapplicationv2.retrofit.Util
+import com.mr_mir.testapplicationv2.singleton.AnswersSingleton
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 
 
-class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnItemSelectedListener {
+class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnItemSelectedListener,
+    RadioGroup.OnCheckedChangeListener {
 
     private var viewModel: SurveyViewModel? = null
     private var questionSet: List<SurveyBody>? = null
@@ -36,7 +35,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
     private var dropdownSetup: Boolean = false
     private var checkboxSetup: Boolean = false
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -45,8 +43,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
         init()
         fetchApiData()
         setView()
-
-//        var option: List<String>? = data?.split(",")
 
     }
 
@@ -207,10 +203,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
         val option: List<String>? = questionSet?.get(currentQuestionNumber)?.options?.split(",")
         for (x in 0 until option?.size!!) {
             val rb = RadioButton(context)
-            rb.id = View.generateViewId();
+            rb.id = View.generateViewId()
             rb.text = option[x]
-            rb.setOnClickListener(this);
-            rgMultipleChoice.addView(rb);
+            rb.setOnClickListener(this)
+            rgMultipleChoice.addView(rb)
+            rgMultipleChoice.setOnCheckedChangeListener(this)
         }
         multipleChoiceCreated = true
     }
@@ -265,7 +262,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
             }
 
             R.id.tvSubmit -> {
-                Util.showToast(context, "Didn't get any requirements for this function :)")
+//                Util.showToast(context, "Didn't get any requirements for this function :)")
+                submitData()
             }
 
             R.id.fail -> {
@@ -279,11 +277,36 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
         }
     }
 
+    private fun submitData() {
+        AnswersSingleton.textAnswer = etText.text.toString()
+        if (etNumber.text.toString() == "null") {
+            AnswersSingleton.numberAnswer = ""
+        } else{
+            AnswersSingleton.numberAnswer = etNumber.text.toString()
+        }
+
+        if(AnswersSingleton.textAnswer.isNullOrBlank() ||
+                AnswersSingleton.dropDownAnswer.isNullOrBlank() ||
+                AnswersSingleton.multipleChoiceAnswer.isNullOrBlank() ||
+                AnswersSingleton.checkboxAnswers.isNullOrEmpty()) {
+            Util.showToast(context, "Please Answer the mandatory fields")
+        } else {
+            finish()
+            Util.goToNextActivity(context, ResultActivity::class.java)
+        }
+
+    }
+
     override fun onNothingSelected(parent: AdapterView<*>?) {
 //        todo
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         spinner.setSelection(position)
+        AnswersSingleton.dropDownAnswer = spinner.selectedItem.toString()
+    }
+
+    override fun onCheckedChanged(group: RadioGroup?, checkedId: Int) {
+        AnswersSingleton.multipleChoiceAnswer = findViewById<RadioButton>(checkedId).text.toString()
     }
 }

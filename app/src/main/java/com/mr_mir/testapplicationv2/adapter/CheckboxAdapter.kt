@@ -8,6 +8,7 @@ import android.widget.CheckBox
 import android.widget.CompoundButton
 import androidx.recyclerview.widget.RecyclerView
 import com.mr_mir.testapplicationv2.R
+import com.mr_mir.testapplicationv2.singleton.AnswersSingleton
 
 /**
  * Created by Shitab Mir on 28,July,2020
@@ -37,7 +38,12 @@ class CheckboxAdapter(var context: Context, var list: List<String>?): RecyclerVi
     }
 
     override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
-        // todo
+        if (isChecked) {
+            AnswersSingleton.checkboxAnswers.add(buttonView?.text.toString())
+        } else {
+            if (AnswersSingleton.checkboxAnswers.contains(buttonView?.text.toString())) {
+                AnswersSingleton.checkboxAnswers.remove(buttonView?.text.toString())
+            }
+        }
     }
-
 }

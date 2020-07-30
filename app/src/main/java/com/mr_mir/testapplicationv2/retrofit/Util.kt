@@ -2,8 +2,10 @@ package com.mr_mir.testapplicationv2.retrofit
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
+import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -18,6 +20,18 @@ class Util {
         fun showToast(context: Context?, msg: String?) {
             Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
         }
+
+        fun goToNextActivity(
+            context: Context,
+            //bundle: Bundle?,
+            targetActivity: Class<out Activity?>?
+        ) {
+            val intent = Intent(context, targetActivity)
+            //intent.putExtras(bundle!!)
+            context.startActivity(intent)
+        }
+
+
         fun hideKeyboard(activity: Activity) {
             val imm =
                 activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
